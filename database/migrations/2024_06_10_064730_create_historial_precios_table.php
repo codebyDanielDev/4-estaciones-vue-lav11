@@ -16,7 +16,6 @@ class CreateHistorialPreciosTable extends Migration
             $table->decimal('dividendo', 10, 2)->check('dividendo >= 0');
             $table->decimal('porcentaje', 5, 2)->check('porcentaje >= 0');
             $table->decimal('precio_venta', 10, 2)->check('precio_venta >= 0');
-            $table->date('fecha');
             $table->timestamps();
         });
     }

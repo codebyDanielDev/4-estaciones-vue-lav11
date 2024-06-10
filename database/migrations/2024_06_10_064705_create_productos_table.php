@@ -13,7 +13,6 @@ class CreateProductosTable extends Migration
             $table->string('nombre', 100);
             $table->foreignId('unidad_id')->constrained('unidades');
             $table->foreignId('categoria_id')->constrained('categorias');
-            $table->date('fecha');
             $table->timestamps();
         });
     }
