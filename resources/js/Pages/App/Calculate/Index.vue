@@ -1,21 +1,45 @@
 <script setup>
+import { ref, defineAsyncComponent } from 'vue';
+import { Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import BaseModal from '@/Components/BaseModal.vue';
+import { useModal } from '@/composables/useModal';
 
-const products = [
-    { name: 'Producto 1', price: 100, quantity: 0, total: 0, note: '' },
-    { name: 'Producto 2', price: 200, quantity: 0, total: 0, note: '' },
-    // Agrega más productos según sea necesario
-];
+// Definir componentes asincrónicos para modales
+const AddProduct = defineAsyncComponent(() => import('@/Components/AddProductModal.vue'));
+
+const { isModalOpen, currentComponent, modalProps, openModal, closeModal } = useModal();
+
+const openAddProductModal = () => {
+    openModal(AddProduct, { title: 'Add Product' });
+};
+
+
+
 </script>
 
 <template>
     <AppLayout title="Calcular precios">
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                Calcular precios
-            </h2>
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+                    Lista de Productos
+                </h2>
 
+                <button @click="openAddProductModal"
+                    class="px-4 py-2 mt-4 text-sm font-semibold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+                    Agregar Producto
+                </button>
+            </div>
         </template>
+        <div>
+            <BaseModal :isOpen="isModalOpen" :title="modalProps.title" @close="closeModal">
+                <component :is="currentComponent" v-bind="modalProps"></component>
+            </BaseModal>
+        </div>
+
+
+
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -47,10 +71,7 @@ const products = [
                                                 class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">
                                                 Cantidad
                                             </th>
-                                            <th scope="col"
-                                                class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">
-                                                Cantidad
-                                            </th>
+
                                             <th scope="col"
                                                 class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">
                                                 Precio Total
@@ -59,36 +80,33 @@ const products = [
                                     </thead>
                                     <tbody
                                         class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                        <tr v-for="(product, index) in products" :key="index">
+                                        <tr>
                                             <td
                                                 class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-gray-200">
-                                                {{ product.name }}
+                                                NOMBRE
                                             </td>
                                             <td
                                                 class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-300">
-                                                {{ product.price }}
+                                                DIVISOR
                                             </td>
                                             <td
                                                 class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-300">
-                                                {{ product.price }}
+                                                Minimo
                                             </td>
                                             <td
                                                 class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-300">
-                                                {{ product.price }}
+                                                Maximo
                                             </td>
+
                                             <td
                                                 class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-300">
-                                                {{ product.total }}
-                                            </td>
-                                            <td
-                                                class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-300">
-                                                <input type="number" v-model="product.quantity"
+                                                <input type="number"
                                                     class="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300" />
                                             </td>
 
                                             <td
                                                 class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-300">
-                                                <input type="text" v-model="product.note"
+                                                <input type="text"
                                                     class="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300" />
                                             </td>
                                         </tr>

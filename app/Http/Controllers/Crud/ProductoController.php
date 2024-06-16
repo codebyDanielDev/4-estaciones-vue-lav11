@@ -1,11 +1,11 @@
 <?php
-
+//
 namespace App\Http\Controllers\Crud;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-
+use App\Models\Producto;
 use Inertia\Inertia;
 
 class ProductoController extends Controller
@@ -15,8 +15,13 @@ class ProductoController extends Controller
      */
     public function index()
     {
+        // Obtén los productos paginados
+        $productos = Producto::paginate(10); // Cambia el número 10 por la cantidad de productos por página que desees
 
-        return Inertia::render('App/Calculate/Index');
+        // Pasa los productos paginados a la vista
+        return Inertia::render('App/Crud/Product/Index', [
+            'productos' => $productos,
+        ]);
     }
 
     /**
@@ -24,7 +29,7 @@ class ProductoController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('App/Crud/Product/Create');
     }
 
     /**
@@ -40,7 +45,7 @@ class ProductoController extends Controller
      */
     public function show(string $id)
     {
-        //
+        return Inertia::render('App/Crud/Product/Show');
     }
 
     /**
@@ -48,7 +53,7 @@ class ProductoController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        return Inertia::render('App/Crud/Product/Edit');
     }
 
     /**
