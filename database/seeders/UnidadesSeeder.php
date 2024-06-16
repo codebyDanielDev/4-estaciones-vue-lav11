@@ -11,21 +11,8 @@ class UnidadesSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-    public function run(): void
+    public function run()
     {
-        $unidades = new Unidad();
-        $unidades->nombre = 'cajas';
-        $unidades->acronimo = 'CJ';
-        $unidades->save();
-
-        $unidades = new Unidad();
-        $unidades->nombre = 'sacos';
-        $unidades->acronimo = 'SC';
-        $unidades->save();
-
-        $unidades = new Unidad();
-        $unidades->nombre = 'kilos';
-        $unidades->acronimo = 'KG';
-        $unidades->save();
+        Unidad::factory()->count(10)->create();
     }
 }

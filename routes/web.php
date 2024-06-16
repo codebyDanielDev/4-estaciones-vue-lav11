@@ -3,22 +3,42 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HistoryController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\CalcularController;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+use App\Http\Controllers\Crud\ProductoController;
+
+
+
+Route::middleware(['auth'])->group(function () {
+
+    Route::redirect('/', '/dashboard');
+    // Ruta para el dashboard de administración utilizando el controlador
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/calculate', [CalcularController::class, 'index'])->name('calculate');
+
+    Route::get('/report', [ReportController::class, 'index'])->name('report');
+
+    Route::get('/history', [HistoryController::class, 'index'])->name('history');
+
+
+
+    // Route::get('/products', [ProductoController::class, 'index'])->name('products.index');
+
+
+
+
+
+    Route::resource('products', ProductoController::class)->names([
+        'index' => 'products.index',
+        'create' => 'products.create',
+        'show' => 'products.show',
+        'edit' => 'products.edit',
     ]);
 });
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
-});
+

@@ -9,7 +9,15 @@ class Producto extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nombre', 'unidad_id', 'categoria_id'];
+    protected $fillable = [
+        'nombre',
+        'unidad_id',
+        'categoria_id',
+        'dividendo',
+        'porcentaje_min',
+        'porcentaje_max',
+        'user_id'
+    ];
 
     // Relación con unidades
     public function unidad()
@@ -21,6 +29,12 @@ class Producto extends Model
     public function categoria()
     {
         return $this->belongsTo(Categoria::class);
+    }
+
+    // Relación con usuarios
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     // Relación con historial de precios
