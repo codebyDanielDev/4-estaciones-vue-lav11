@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             CategoriasSeeder::class,
             ProductosSeeder::class,
             HistorialPreciosSeeder::class,
+            HProductSeeder::class,
         ]);
     }
 }
