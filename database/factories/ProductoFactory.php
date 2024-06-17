@@ -32,7 +32,7 @@ class ProductoFactory extends Factory
             'dividendo' => $this->faker->randomFloat(2, 1, 100),
             'porcentaje_min' => $this->faker->randomFloat(2, 0, 100),
             'porcentaje_max' => $this->faker->optional()->randomFloat(2, 0, 100),
-            'user_id' => User::factory(),
+            //'user_id' => User::factory(),
         ];
     }
 }

@@ -16,7 +16,6 @@ class Producto extends Model
         'dividendo',
         'porcentaje_min',
         'porcentaje_max',
-        'user_id'
     ];
 
     // Relación con unidades
@@ -31,15 +30,9 @@ class Producto extends Model
         return $this->belongsTo(Categoria::class);
     }
 
-    // Relación con usuarios
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
     // Relación con historial de precios
-    // public function historialPrecios()
-    // {
-    //     return $this->hasMany(HistorialPrecio::class);
-    // }
+    public function historialPrecios()
+    {
+        return $this->hasMany(HistorialPrecio::class);
+    }
 }
