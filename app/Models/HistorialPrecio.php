@@ -11,15 +11,29 @@ class HistorialPrecio extends Model
 
     protected $fillable = [
         'producto_id',
-        'precio_compra',
+        'user_id',
+        'precio_compra_total',
         'cantidad',
+        'precio_compra_producto',
         'dividendo',
-        'porcentaje',
+        'porcentaje_min',
+        'porcentaje_max',
         'precio_venta'
     ];
 
+    /**
+     * Define la relación belongsTo con el modelo Producto.
+     */
     public function producto()
     {
         return $this->belongsTo(Producto::class);
+    }
+
+    /**
+     * Define la relación belongsTo con el modelo User.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }
