@@ -25,7 +25,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/calcular/restore/{id}', [CalcularController::class, 'restore'])->name('calcular.restore');
     Route::post('/calcular/store', [CalcularController::class, 'store']);
     Route::post('/calcular/store-multiple', [CalcularController::class, 'storeMultiple']);
+    Route::get('/calcular/get-list-productos', [CalcularController::class, 'getListProductos']);
 
+
+    
     Route::get('/report', [ReportController::class, 'index'])->name('report');
 
     Route::get('/history', [HistoryController::class, 'index'])->name('history');

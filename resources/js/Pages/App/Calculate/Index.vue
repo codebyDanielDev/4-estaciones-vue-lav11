@@ -2,27 +2,24 @@
 import { ref, defineAsyncComponent } from 'vue'; // Asegúrate de importar defineAsyncComponent aquí
 import AppLayout from '@/Layouts/AppLayout.vue';
 import BaseModal from '@/Components/BaseModal.vue';
+import axios from 'axios';
+import { useToast } from 'vue-toastification';
 import { useModal } from '@/composables/useModal';
 import { defineProps } from 'vue';
-import axios from 'axios';
-
-import { useToast } from 'vue-toastification';
 
 const toast = useToast();
-
-
 const AddProduct = defineAsyncComponent(() => import('@/Components/AddProductModal.vue'));
-
 const { isModalOpen, currentComponent, modalProps, openModal, closeModal } = useModal();
-
 const openAddProductModal = () => {
     openModal(AddProduct, { title: 'Agregar Producto' });
 };
 
-
 const isLargeModalOpen = ref(false);
-const openLargeModal = () => {
-    isLargeModalOpen.value = true;
+const openLargeModal = async () => {
+    const success = await loadListProductos();
+    if (success) {
+        isLargeModalOpen.value = true;
+    }
 };
 const closeLargeModal = () => {
     isLargeModalOpen.value = false;
@@ -30,11 +27,10 @@ const closeLargeModal = () => {
 
 const props = defineProps({
     calculate_productos: Array,
-    list_productos: Array
 });
 
 const calculate_productos = ref(props.calculate_productos);
-const list_productos = ref(props.list_productos);
+const list_productos = ref([]);
 
 const selectedProducts = ref([]);
 const isDropdownOpen = ref(false);
@@ -65,10 +61,10 @@ const selectAll = (event) => {
 const addProduct = async (product) => {
     try {
         await axios.post('/calcular/store-multiple', { producto_ids: [product.id] });
-        // Actualizar el estado local después de agregar
         calculate_productos.value.push(product);
-        list_productos.value = list_productos.value.filter(p => p.id !== product.id); // Eliminar el producto agregado de la lista
+        list_productos.value = list_productos.value.filter(p => p.id !== product.id);
         toast.success('Producto agregado exitosamente');
+        await loadListProductos(); // Volver a cargar la lista de productos
     } catch (error) {
         console.error('Hubo un error!', error);
         toast.error('Error agregando producto');
@@ -78,17 +74,33 @@ const addProduct = async (product) => {
 const addProducts = async () => {
     try {
         await axios.post('/calcular/store-multiple', { producto_ids: selectedProducts.value });
-        // Actualizar el estado local después de agregar
         selectedProducts.value.forEach(id => {
             const product = list_productos.value.find(product => product.id === id);
             calculate_productos.value.push(product);
-            list_productos.value = list_productos.value.filter(p => p.id !== id); // Eliminar los productos agregados de la lista
+            list_productos.value = list_productos.value.filter(p => p.id !== id);
         });
         selectedProducts.value = [];
         toast.success('Productos agregados exitosamente');
+        await loadListProductos(); // Volver a cargar la lista de productos
     } catch (error) {
         console.error('Hubo un error!', error);
         toast.error('Error agregando productos');
+    }
+};
+
+const loadListProductos = async () => {
+    try {
+        const response = await axios.get('/calcular/get-list-productos');
+        if (response.status === 204) {
+            toast.info('No hay productos disponibles');
+            return false;
+        }
+        list_productos.value = response.data;
+        return true;
+    } catch (error) {
+        console.error('Error cargando productos:', error);
+        toast.error('Error cargando productos');
+        return false;
     }
 };
 </script>
@@ -201,7 +213,7 @@ const addProducts = async () => {
 
 
         <div>
-        <div v-if="isLargeModalOpen" id="large-modal" tabindex="-1"
+            <div v-if="isLargeModalOpen" id="large-modal" tabindex="-1"
             class="fixed top-0 left-0 right-0 z-50 flex items-center justify-center w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
             <div class="relative w-full max-w-4xl max-h-full">
                 <div class="p-4 space-y-4 md:p-5">
@@ -282,7 +294,7 @@ const addProducts = async () => {
                 </div>
             </div>
         </div>
-    </div>
+        </div>
 
 
 

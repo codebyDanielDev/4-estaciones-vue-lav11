@@ -11,21 +11,32 @@ class CalcularController extends Controller
 {
     public function index()
     {
-        // ayaayya
         // Obtener todos los IDs de productos desde la tabla hproducts
         $productoIds = HProduct::pluck('producto_id');
 
         // Obtener los productos que coinciden con los IDs obtenidos de hproducts
         $calculate_productos = Producto::whereIn('id', $productoIds)->get();
 
+        return Inertia::render('App/Calculate/Index', [
+            'calculate_productos' => $calculate_productos,
+        ]);
+    }
+
+    public function getListProductos()
+    {
+        // Obtener todos los IDs de productos desde la tabla hproducts
+        $productoIds = HProduct::pluck('producto_id');
+
         // Obtener los productos que no están en la tabla hproducts
         $list_productos = Producto::whereNotIn('id', $productoIds)->get();
 
-        return Inertia::render('App/Calculate/Index', [
-            'calculate_productos' => $calculate_productos,
-            'list_productos' => $list_productos,
-        ]);
+        if ($list_productos->isEmpty()) {
+            return response()->json(['message' => 'No hay productos disponibles'], 204);
+        }
+
+        return response()->json($list_productos);
     }
+
 
     public function archive($id)
     {
@@ -59,20 +70,20 @@ class CalcularController extends Controller
         return response()->json(['message' => 'Producto agregado exitosamente', 'hproduct' => $hproduct]);
     }
     public function storeMultiple(Request $request)
-{
-    $request->validate([
-        'producto_ids' => 'required|array',
-        'producto_ids.*' => 'exists:productos,id',
-    ]);
-
-    $productoIds = $request->producto_ids;
-
-    foreach ($productoIds as $productoId) {
-        HProduct::create([
-            'producto_id' => $productoId,
+    {
+        $request->validate([
+            'producto_ids' => 'required|array',
+            'producto_ids.*' => 'exists:productos,id',
         ]);
-    }
 
-    return response()->json(['message' => 'Productos agregados exitosamente']);
-}
+        $productoIds = $request->producto_ids;
+
+        foreach ($productoIds as $productoId) {
+            HProduct::create([
+                'producto_id' => $productoId,
+            ]);
+        }
+
+        return response()->json(['message' => 'Productos agregados exitosamente']);
+    }
 }
