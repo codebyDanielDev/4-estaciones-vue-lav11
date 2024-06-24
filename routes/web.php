@@ -19,7 +19,12 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+
     Route::get('/calculate', [CalcularController::class, 'index'])->name('calculate');
+    Route::delete('/calcular/archive/{id}', [CalcularController::class, 'archive'])->name('calcular.archive');
+    Route::post('/calcular/restore/{id}', [CalcularController::class, 'restore'])->name('calcular.restore');
+    Route::post('/calcular/store', [CalcularController::class, 'store']);
+    Route::post('/calcular/store-multiple', [CalcularController::class, 'storeMultiple']);
 
     Route::get('/report', [ReportController::class, 'index'])->name('report');
 
