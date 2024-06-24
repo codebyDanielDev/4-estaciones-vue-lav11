@@ -16,7 +16,7 @@ class CreateProductosTable extends Migration
             $table->decimal('dividendo', 10, 2)->default(1); // Divisor específico para cada producto
             $table->decimal('porcentaje_min', 5, 2)->default(0);
             $table->decimal('porcentaje_max', 5, 2)->default(0)->nullable();  // Puede ser nulo
-            $table->foreignId('user_id')->constrained('users');
+            //$table->foreignId('user_id')->constrained('users');
             $table->timestamps();
         });
     }

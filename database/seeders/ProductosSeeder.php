@@ -24,12 +24,10 @@ class ProductosSeeder extends Seeder
     {
         $unidades = Unidad::all();
         $categorias = Categoria::all();
-        $users = User::all();
 
-        Producto::factory()->count(999)->make()->each(function ($producto) use ($unidades, $categorias, $users) {
+        Producto::factory()->count(999)->make()->each(function ($producto) use ($unidades, $categorias) {
             $producto->unidad_id = $unidades->random()->id;
             $producto->categoria_id = $categorias->random()->id;
-            $producto->user_id = $users->random()->id;
             $producto->save();
         });
     }

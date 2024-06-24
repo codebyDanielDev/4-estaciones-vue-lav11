@@ -19,8 +19,8 @@ class DatabaseSeeder extends Seeder
             UnidadesSeeder::class,
             CategoriasSeeder::class,
             ProductosSeeder::class,
+            HistorialPreciosSeeder::class,
+            HProductSeeder::class,
         ]);
-
-
     }
 }
