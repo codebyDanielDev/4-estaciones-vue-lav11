@@ -62,27 +62,34 @@ const selectAll = (event) => {
     }
 };
 
-const addProduct = (id) => {
-    axios.post('/calcular/store-multiple', { producto_ids: [id] })
-        .then(response => {
-            toast.success('Producto agregado exitosamente');
-        })
-        .catch(error => {
-            console.error('Hubo un error!', error);
-            toast.error('Error agregando producto');
-        });
+const addProduct = async (product) => {
+    try {
+        await axios.post('/calcular/store-multiple', { producto_ids: [product.id] });
+        // Actualizar el estado local después de agregar
+        calculate_productos.value.push(product);
+        list_productos.value = list_productos.value.filter(p => p.id !== product.id); // Eliminar el producto agregado de la lista
+        toast.success('Producto agregado exitosamente');
+    } catch (error) {
+        console.error('Hubo un error!', error);
+        toast.error('Error agregando producto');
+    }
 };
 
-const addProducts = () => {
-    axios.post('/calcular/store-multiple', { producto_ids: selectedProducts.value })
-        .then(response => {
-            toast.success('Productos agregados exitosamente');
-            selectedProducts.value = [];
-        })
-        .catch(error => {
-            console.error('Hubo un error!', error);
-            toast.error('Error agregando productos');
+const addProducts = async () => {
+    try {
+        await axios.post('/calcular/store-multiple', { producto_ids: selectedProducts.value });
+        // Actualizar el estado local después de agregar
+        selectedProducts.value.forEach(id => {
+            const product = list_productos.value.find(product => product.id === id);
+            calculate_productos.value.push(product);
+            list_productos.value = list_productos.value.filter(p => p.id !== id); // Eliminar los productos agregados de la lista
         });
+        selectedProducts.value = [];
+        toast.success('Productos agregados exitosamente');
+    } catch (error) {
+        console.error('Hubo un error!', error);
+        toast.error('Error agregando productos');
+    }
 };
 </script>
 
@@ -248,7 +255,7 @@ const addProducts = () => {
                                     {{ list_producto.porcentaje_max }}
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-300">
-                                    <button @click="addProduct(list_producto.id)" :disabled="selectedProducts.length > 0"
+                                    <button @click="addProduct(list_producto)" :disabled="selectedProducts.length > 0"
                                         class="px-4 py-2 font-semibold text-white bg-green-500 rounded-md shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed">
                                         Agregar
                                     </button>
@@ -267,10 +274,7 @@ const addProducts = () => {
                 </div>
                 <div
                     class="flex items-center p-4 space-x-3 border-t border-gray-200 rounded-b md:p-5 rtl:space-x-reverse dark:border-gray-600">
-                    <button @click="closeLargeModal" type="button"
-                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                        Aceptar
-                    </button>
+
                     <button @click="closeLargeModal" type="button"
                         class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
                         Cancelar

@@ -11,7 +11,7 @@ class CalcularController extends Controller
 {
     public function index()
     {
-        //ayaayya
+        // ayaayya
         // Obtener todos los IDs de productos desde la tabla hproducts
         $productoIds = HProduct::pluck('producto_id');
 
