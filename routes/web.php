@@ -26,9 +26,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/calcular/store', [CalcularController::class, 'store']);
     Route::post('/calcular/store-multiple', [CalcularController::class, 'storeMultiple']);
     Route::get('/calcular/get-list-productos', [CalcularController::class, 'getListProductos']);
+    Route::post('/calcular-y-guardar', [CalcularController::class, 'calcularYGuardar']);
 
 
-    
     Route::get('/report', [ReportController::class, 'index'])->name('report');
 
     Route::get('/history', [HistoryController::class, 'index'])->name('history');
@@ -46,7 +46,10 @@ Route::middleware(['auth'])->group(function () {
         'create' => 'products.create',
         'show' => 'products.show',
         'edit' => 'products.edit',
+        'store' => 'products.store', // Asegúrate de tener esta línea
     ]);
+    Route::get('/categorias', [ProductoController::class, 'getCategorias'])->name('categorias.get');
+    Route::get('/unidades', [ProductoController::class, 'getUnidades'])->name('unidades.get');
 });
 
 

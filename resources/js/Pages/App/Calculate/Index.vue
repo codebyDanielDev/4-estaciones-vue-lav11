@@ -6,7 +6,6 @@ import axios from 'axios';
 import { useToast } from 'vue-toastification';
 import { useModal } from '@/composables/useModal';
 import { defineProps } from 'vue';
-
 const toast = useToast();
 const AddProduct = defineAsyncComponent(() => import('@/Components/AddProductModal.vue'));
 const { isModalOpen, currentComponent, modalProps, openModal, closeModal } = useModal();
@@ -65,6 +64,9 @@ const addProduct = async (product) => {
         list_productos.value = list_productos.value.filter(p => p.id !== product.id);
         toast.success('Producto agregado exitosamente');
         await loadListProductos(); // Volver a cargar la lista de productos
+        if (list_productos.value.length === 0) {
+            closeLargeModal();
+        }
     } catch (error) {
         console.error('Hubo un error!', error);
         toast.error('Error agregando producto');
@@ -82,6 +84,7 @@ const addProducts = async () => {
         selectedProducts.value = [];
         toast.success('Productos agregados exitosamente');
         await loadListProductos(); // Volver a cargar la lista de productos
+        closeLargeModal(); // Cerrar el modal después de agregar los productos seleccionados
     } catch (error) {
         console.error('Hubo un error!', error);
         toast.error('Error agregando productos');
@@ -101,6 +104,18 @@ const loadListProductos = async () => {
         console.error('Error cargando productos:', error);
         toast.error('Error cargando productos');
         return false;
+    }
+};
+
+
+
+const enviarDatos = async () => {
+    try {
+        await axios.post('/calcular-y-guardar', { productos: calculate_productos.value });
+        toast.success('Datos guardados exitosamente');
+    } catch (error) {
+        console.error('Error al guardar los datos:', error);
+        toast.error('Error al guardar los datos');
     }
 };
 </script>
@@ -178,11 +193,11 @@ const loadListProductos = async () => {
                                     {{ calculate_producto.porcentaje_max }}
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-300">
-                                    <input type="number"
+                                    <input type="number" v-model.number="calculate_producto.cantidad"
                                         class="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300" />
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-300">
-                                    <input type="text"
+                                    <input type="number" v-model.number="calculate_producto.precio_compra_total"
                                         class="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300" />
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-300">
@@ -203,99 +218,98 @@ const loadListProductos = async () => {
                             </tr>
                         </tbody>
                     </table>
-                    <button
-                        class="px-4 py-2 font-semibold text-white bg-blue-500 rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Calcular
+                    <button @click="enviarDatos"
+                        class="px-4 py-2 mt-4 font-semibold text-white bg-green-500 rounded-md shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        Guardar
                     </button>
                 </div>
             </div>
         </div>
-
 
         <div>
             <div v-if="isLargeModalOpen" id="large-modal" tabindex="-1"
-            class="fixed top-0 left-0 right-0 z-50 flex items-center justify-center w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-            <div class="relative w-full max-w-4xl max-h-full">
-                <div class="p-4 space-y-4 md:p-5">
+                class="fixed inset-0 z-50 flex items-center justify-center w-full p-4 overflow-x-hidden overflow-y-auto bg-gray-900 bg-opacity-50">
+                <div class="relative w-full max-w-4xl max-h-full bg-white rounded-lg shadow-lg dark:bg-gray-800">
+                    <div class="p-4 space-y-4 md:p-5">
 
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-700">
-                            <tr>
-                                <th scope="col"
-                                    class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">
-                                    <input type="checkbox" @click="selectAll">
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">
-                                    Producto
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">
-                                    Divisor
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">
-                                    % Minimo
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">
-                                    % Maximo
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">
-                                    Acción
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                            <tr v-for="(list_producto, index) in list_productos" :key="index">
-                                <td
-                                    class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-gray-200">
-                                    <input type="checkbox" v-model="selectedProducts" :value="list_producto.id">
-                                </td>
-                                <td
-                                    class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-gray-200">
-                                    {{ list_producto.nombre }}
-                                </td>
-                                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-300">
-                                    {{ list_producto.dividendo }}
-                                </td>
-                                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-300">
-                                    {{ list_producto.porcentaje_min }}
-                                </td>
-                                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-300">
-                                    {{ list_producto.porcentaje_max }}
-                                </td>
-                                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-300">
-                                    <button @click="addProduct(list_producto)" :disabled="selectedProducts.length > 0"
-                                        class="px-4 py-2 font-semibold text-white bg-green-500 rounded-md shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed">
-                                        Agregar
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">
+                                        <input type="checkbox" @click="selectAll">
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">
+                                        Producto
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">
+                                        Divisor
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">
+                                        % Minimo
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">
+                                        % Maximo
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-gray-300">
+                                        Acción
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                                <tr v-for="(list_producto, index) in list_productos" :key="index">
+                                    <td
+                                        class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-gray-200">
+                                        <input type="checkbox" v-model="selectedProducts" :value="list_producto.id">
+                                    </td>
+                                    <td
+                                        class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-gray-200">
+                                        {{ list_producto.nombre }}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-300">
+                                        {{ list_producto.dividendo }}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-300">
+                                        {{ list_producto.porcentaje_min }}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-300">
+                                        {{ list_producto.porcentaje_max }}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-300">
+                                        <button @click="addProduct(list_producto)"
+                                            :disabled="selectedProducts.length > 0"
+                                            class="px-4 py-2 font-semibold text-white bg-green-500 rounded-md shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                                            Agregar
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
 
-                    <div v-if="selectedProducts.length > 0" class="flex justify-end mt-4">
-                        <button @click="addProducts"
-                            class="px-4 py-2 font-semibold text-white bg-green-500 rounded-md shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                            Agregar Seleccionados
+                        <div v-if="selectedProducts.length > 0" class="flex justify-end mt-4">
+                            <button @click="addProducts"
+                                class="px-4 py-2 font-semibold text-white bg-green-500 rounded-md shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                Agregar Seleccionados
+                            </button>
+                        </div>
+
+                    </div>
+                    <div
+                        class="flex items-center p-4 space-x-3 border-t border-gray-200 rounded-b dark:border-gray-600">
+
+                        <button @click="closeLargeModal" type="button"
+                            class="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                            Cancelar
                         </button>
                     </div>
-
-                </div>
-                <div
-                    class="flex items-center p-4 space-x-3 border-t border-gray-200 rounded-b md:p-5 rtl:space-x-reverse dark:border-gray-600">
-
-                    <button @click="closeLargeModal" type="button"
-                        class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
-                        Cancelar
-                    </button>
                 </div>
             </div>
         </div>
-        </div>
-
 
 
 

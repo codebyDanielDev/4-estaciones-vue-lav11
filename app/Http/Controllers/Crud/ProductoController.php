@@ -7,6 +7,12 @@ use Illuminate\Http\Request;
 
 use App\Models\Producto;
 use Inertia\Inertia;
+use App\Models\Categoria;
+
+use App\Models\Unidad;
+
+use App\Rules\MinLessThanMax;
+
 
 class ProductoController extends Controller
 {
@@ -37,9 +43,37 @@ class ProductoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:100|unique:productos,nombre',
+            'category' => 'required|exists:categorias,id',
+            'unit' => 'required|exists:unidades,id',
+            'price' => 'required|numeric',
+            'percentage_min' => ['required', 'numeric', 'min:0', 'max:100', new MinLessThanMax],
+            'percentage_max' => 'nullable|numeric|min:0|max:100',
+        ]);
+
+        $producto = new Producto();
+        $producto->nombre = $validatedData['name'];
+        $producto->categoria_id = $validatedData['category'];
+        $producto->unidad_id = $validatedData['unit'];
+        $producto->dividendo = $validatedData['price'];
+        $producto->porcentaje_min = $validatedData['percentage_min'];
+        $producto->porcentaje_max = $validatedData['percentage_max'];
+        $producto->save();
+
+        return response()->json(['message' => 'Producto creado exitosamente']);
     }
 
+    public function getCategorias()
+    {
+        $categorias = Categoria::all();
+        return response()->json($categorias);
+    }
+    public function getUnidades()
+    {
+        $unidades = Unidad::all();
+        return response()->json($unidades);
+    }
     /**
      * Display the specified resource.
      */

@@ -13,6 +13,6 @@ class HistorialPreciosSeeder extends Seeder
      */
     public function run(): void
     {
-        HistorialPrecio::factory()->count(30)->create();
+        HistorialPrecio::factory()->count(0)->create();
     }
 }
