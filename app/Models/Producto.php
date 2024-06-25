@@ -16,6 +16,9 @@ class Producto extends Model
         'dividendo',
         'porcentaje_min',
         'porcentaje_max',
+        'precio_compra_total',
+        'cantidad',
+        'precio_compra_producto',
     ];
 
     // Relación con unidades
