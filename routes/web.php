@@ -34,7 +34,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/history', [HistoryController::class, 'index'])->name('history');
 
 
-
     // Route::get('/products', [ProductoController::class, 'index'])->name('products.index');
 
 

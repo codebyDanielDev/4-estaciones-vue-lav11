@@ -21,6 +21,10 @@ class HistorialPrecio extends Model
         'precio_venta'
     ];
 
+    protected $dates = [
+        'created_at',
+        'updated_at',
+    ];
     /**
      * Define la relación belongsTo con el modelo Producto.
      */
