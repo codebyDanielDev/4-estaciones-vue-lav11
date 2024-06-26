@@ -11,6 +11,14 @@ use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use Illuminate\Support\Facades\DB;
 
+use App\Events\TransactionCreated;
+
+
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
+
+use App\Exports\TransactionDetailsExport;
+
 class CalcularController extends Controller
 {
     public function index()
@@ -161,7 +169,7 @@ class CalcularController extends Controller
             $additionalData = $request->input('productos', []);
 
             // Añadir los datos adicionales a los productos y crear detalles de transacción
-            $productos = $productos->map(function($producto) use ($additionalData, $transaction) {
+            $productos = $productos->map(function ($producto) use ($additionalData, $transaction) {
                 foreach ($additionalData as $data) {
                     if ($data['id'] == $producto->id) {
                         $cantidad = $data['cantidad'] ?? null;
@@ -195,6 +203,9 @@ class CalcularController extends Controller
             });
 
             DB::commit();
+            // Despachar el evento TransactionCreated
+            event(new TransactionCreated($transaction));
+
 
             return response()->json([
                 'message' => 'Datos obtenidos y guardados exitosamente',
@@ -207,5 +218,14 @@ class CalcularController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function export()
+    {
+        return Excel::download(new UsersExport, 'users.xlsx');
+    }
+    public function exportTransactionDetails($transactionId)
+    {
+        return Excel::download(new TransactionDetailsExport($transactionId), 'transaction_details.xlsx');
     }
 }

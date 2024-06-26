@@ -27,6 +27,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/calcular/store-multiple', [CalcularController::class, 'storeMultiple']);
     Route::get('/calcular/get-list-productos', [CalcularController::class, 'getListProductos']);
     Route::post('/calcular-y-guardar', [CalcularController::class, 'calcularYGuardar']);
+    Route::get('/export-users', [CalcularController::class, 'export']);
+    
+    Route::get('/export-transaction-details/{transactionId}', [CalcularController::class, 'exportTransactionDetails']);
+
 
 
     Route::get('/report', [ReportController::class, 'index'])->name('report');
