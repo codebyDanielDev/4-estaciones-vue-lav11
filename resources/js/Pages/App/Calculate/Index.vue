@@ -6,7 +6,6 @@ import axios from 'axios';
 import { useToast } from 'vue-toastification';
 import { useModal } from '@/composables/useModal';
 import { defineProps } from 'vue';
-
 const toast = useToast();
 const AddProduct = defineAsyncComponent(() => import('@/Components/AddProductModal.vue'));
 const { isModalOpen, currentComponent, modalProps, openModal, closeModal } = useModal();
