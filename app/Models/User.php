@@ -12,7 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 use App\Observers\UserObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
- 
+
 #[ObservedBy([UserObserver::class])]
 class User extends Authenticatable
 {
@@ -65,5 +65,9 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
     }
 }
