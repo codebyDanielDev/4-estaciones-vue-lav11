@@ -12,6 +12,8 @@ use App\Http\Controllers\Crud\ProductoController;
 
 
 
+use App\Http\Controllers\PDFController;
+
 Route::middleware(['auth'])->group(function () {
 
     Route::redirect('/', '/dashboard');
@@ -28,7 +30,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/calcular/get-list-productos', [CalcularController::class, 'getListProductos']);
     Route::post('/calcular-y-guardar', [CalcularController::class, 'calcularYGuardar']);
     Route::get('/export-users', [CalcularController::class, 'export']);
-    
+
     Route::get('/export-transaction-details/{transactionId}', [CalcularController::class, 'exportTransactionDetails']);
 
 
@@ -52,8 +54,12 @@ Route::middleware(['auth'])->group(function () {
         'edit' => 'products.edit',
         'store' => 'products.store', // Asegúrate de tener esta línea
     ]);
+
+
     Route::get('/categorias', [ProductoController::class, 'getCategorias'])->name('categorias.get');
     Route::get('/unidades', [ProductoController::class, 'getUnidades'])->name('unidades.get');
+
+    Route::get('/search', [ProductoController::class, 'search'])->name('products.search');
+
+    Route::get('/generar-pdf', [PDFController::class, 'generarPDF']);
 });
-
-
