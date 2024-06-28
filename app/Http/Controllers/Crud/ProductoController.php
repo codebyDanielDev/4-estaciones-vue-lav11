@@ -108,15 +108,15 @@ class ProductoController extends Controller
     public function search(Request $request)
     {
         // Validate the search query
-        $request->validate([
+        $validated = $request->validate([
             'query' => 'required|string|min:1',
         ]);
 
         // Retrieve the search query from the request
-        $query = $request->input('query');
+        $query = $validated['query'];
 
-        // Search for products where the name contains the search query
-        $products = Producto::where('nombre', 'LIKE', "%{$query}%")->get();
+        // Paginate the search results
+        $products = Producto::where('nombre', 'LIKE', "%{$query}%")->paginate(10);
 
         // Return the search results as a JSON response
         return response()->json($products);

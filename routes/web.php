@@ -4,14 +4,13 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\CalcularController;
 
 use App\Http\Controllers\Crud\ProductoController;
 
-
-
+use App\Http\Controllers\HistoryController;
+use App\Http\Controllers\HistoryPanelController;
 use App\Http\Controllers\PDFController;
 
 Route::middleware(['auth'])->group(function () {
@@ -37,11 +36,14 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/report', [ReportController::class, 'index'])->name('report');
 
-    Route::get('/history', [HistoryController::class, 'index'])->name('history');
 
 
+    Route::get('/history', [HistoryPanelController::class, 'history'])->name('history');
+    Route::get('/fetch-transactions', [HistoryPanelController::class, 'fetchTransactions'])->name('fetch-transactions');
 
     // Route::get('/products', [ProductoController::class, 'index'])->name('products.index');
+
+
 
 
 
