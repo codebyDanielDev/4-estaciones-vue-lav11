@@ -29,7 +29,7 @@ class HistoryPanelController extends Controller
         }
 
         try {
-            $perPage = $request->get('perPage', 10); // Número inicial de elementos por página
+            $perPage = $request->get('perPage', 1); // Número inicial de elementos por página
             $page = $request->get('page', 1); // Página actual
 
             $transactions = $this->getTransactions($perPage, $page);
@@ -47,7 +47,8 @@ class HistoryPanelController extends Controller
     private function getTransactions($perPage, $page)
     {
         return Transaction::with(['details.producto', 'user'])
-            ->orderBy('created_at', 'desc')
+            ->orderBy('created_at', 'desc') // Asegura que los registros más recientes se muestren primero
             ->paginate($perPage, ['*'], 'page', $page);
     }
+
 }

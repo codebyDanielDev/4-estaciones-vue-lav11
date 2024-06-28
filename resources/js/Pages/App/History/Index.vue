@@ -1,11 +1,11 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const transactions = ref([]);
 const currentPage = ref(1);
-const perPage = ref(3);
+const perPage = ref(1);
 const loading = ref(false);
 const error = ref('');
 const noMoreResults = ref(false);
@@ -27,7 +27,8 @@ const fetchTransactions = async () => {
         const fetchedTransactions = response.data.transactions.data;
 
         if (fetchedTransactions.length > 0) {
-            transactions.value.push(...fetchedTransactions);
+            // Insertar las nuevas transacciones al principio del array para mantener el orden
+            transactions.value = [...transactions.value, ...fetchedTransactions];
             currentPage.value++;
         } else {
             noMoreResults.value = true;
@@ -112,6 +113,11 @@ onMounted(() => {
                     </div>
                     <div v-if="noMoreResults" class="flex justify-center text-gray-600 dark:text-gray-400">
                         <span>Ya no hay más resultados</span>
+                    </div>
+                    <div v-if="!noMoreResults && !loading" class="flex justify-center mt-4">
+                        <button @click="fetchTransactions" class="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600">
+                            Cargar más
+                        </button>
                     </div>
                 </div>
                 <div id="scroll-anchor" class="h-1"></div>
